@@ -4,7 +4,9 @@ Python kinematics for a six-joint AR-601M arm: forward kinematics, analytical an
 
 This is a course project for [Introduction to Robotics at MIPT](https://github.com/Lupasic/In2Ro_MIPT_2026). It uses the published arm geometry and adapts the course's [starter interface](https://github.com/Lupasic/In2Ro_MIPT_2026/tree/main/slides/homework/W01/input_data).
 
-![AR-601M arm at a generic configuration](figures/task2_generic.png)
+![AR-601M robot standing](figures/ar601m_robot.png)
+
+Photo from the [course assignment](https://github.com/Lupasic/In2Ro_MIPT_2026/blob/main/slides/homework/W01/resources/ar601m_robot.png).
 
 ## Results
 
