@@ -1,21 +1,36 @@
-# AR-601M — Homework 1
+# AR-601M Arm Kinematics
 
-From a clean checkout with [Pixi](https://pixi.sh) installed:
+Python kinematics for a six-joint AR-601M arm: forward kinematics, analytical and numerical inverse kinematics, a spatial Jacobian, and singularity and workspace maps. The model covers both mirrored arms.
+
+This is a course project for [Introduction to Robotics at MIPT](https://github.com/Lupasic/In2Ro_MIPT_2026). It uses the published arm geometry and adapts the course's [starter interface](https://github.com/Lupasic/In2Ro_MIPT_2026/tree/main/slides/homework/W01/input_data).
+
+![AR-601M arm at a generic configuration](figures/task2_generic.png)
+
+## Results
+
+- Analytical IK enumerates isolated real branches before joint-limit filtering and represents continuous singular families separately. One reachable target has two feasible branches for each arm.
+- Numerical IK reaches both branches from different initial configurations; unsuccessful runs and their residuals are retained in the report.
+- Two Jacobian derivations agree with a finite-difference check. A 15,625-configuration joint-space scan and a fixed-orientation Cartesian slice show singular regions and feasible IK counts.
+
+The [technical report](REPORT.md) gives the derivations, parameters, numerical results, tolerances, and figures for Tasks 1–6.
+
+## Reproduce
+
+Install [Pixi](https://pixi.sh), then run from the repository root:
 
 ```bash
 pixi run check
 ```
 
-This runs the tests and regenerates [REPORT.md](REPORT.md) and every image in `figures/`. The report covers Tasks 1–6 in order. Joint angles in the Python API are radians; CLI angles are degrees; lengths are metres.
+This runs the automated tests and regenerates `REPORT.md` and all figures from a clean checkout.
 
-- `robot_model.json`, `robot_model_left.json`: six-joint models for right/left arms.
-- `src/kinematics.py`: required `FK`, `IK`, `DifferentialKinematics` interface; `src/task*.py`: solvers and analyses; `tests/`: automated checks.
-- `task1_interactive_3d.html`: rotatable frame diagram; `src/visualize.py`: Task 2/3 angle and pose visualizer. Examples:
+## Explore poses
 
 ```bash
-pixi run python src/visualize.py --q 20 -35 10 25 40 -15 --show
-pixi run python src/visualize.py --fk-target 10 5 -30 -40 -30 20 --side left --show
-pixi run python src/visualize.py --pose 0.2 -0.3 0.2 0 0 0 --side right --show
+pixi run python src/visualize.py --q 20 -35 10 25 40 -15
+pixi run python src/visualize.py --fk-target 10 5 -30 -40 -30 20 --side left
 ```
 
-The `--pose` arguments are `x y z roll pitch yaw` in ZYX convention. Omit `--show` to save PNGs. The project adapts the [course starter files](https://github.com/Lupasic/In2Ro_MIPT_2026/tree/main/slides/homework/W01/input_data); the report records the chosen transformation chain and tests.
+`--q` prints the base-to-tool transform and saves an arm drawing. `--fk-target` prints and draws every feasible IK branch for the pose generated from those six angles. Use `--pose x y z roll pitch yaw` for a target pose, or add `--show` to open the drawings. CLI angles are degrees; Python API angles are radians; lengths are metres. Orientation uses ZYX roll–pitch–yaw. Download the [rotatable frame diagram](task1_interactive_3d.html) to open it locally in a browser.
+
+The models are in `robot_model.json` and `robot_model_left.json`; the required `FK`, `IK`, and `DifferentialKinematics` entry points are in `src/kinematics.py`.

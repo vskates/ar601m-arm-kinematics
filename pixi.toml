@@ -1,7 +1,7 @@
 [workspace]
-name = "ar601m-hw01"
+name = "ar601m-arm-kinematics"
 version = "0.1.0"
-description = "AR-601M arm kinematics, Homework 1"
+description = "Six-joint arm kinematics, IK, Jacobian and singularity analysis"
 channels = ["conda-forge"]
 platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
 
