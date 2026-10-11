@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AR-601M · Task 1 · интерактивная 3D-схема</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #202124; background: #f5f7fa; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header { padding: 17px 28px; background: white; border-bottom: 1px solid #dfe3e8; }
+    h1 { margin: 0; font-size: 21px; letter-spacing: -.025em; }
+    main { display: grid; grid-template-columns: minmax(570px, 1fr) min(46vw, 800px); gap: 16px; max-width: 1800px; padding: 16px; margin: auto; }
+    .card { background: #fff; border: 1px solid #dfe3e8; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px #14263d0b; }
+    .toolbar { min-height: 56px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid #e8ebef; }
+    label { font-size: 13px; color: #4b5563; }
+    select, button { font: inherit; font-size: 13px; color: #202124; background: white; border: 1px solid #cbd2da; border-radius: 7px; padding: 7px 9px; cursor: pointer; }
+    select:hover, button:hover { border-color: #7b8796; }
+    .toolbar .push { margin-left: auto; }
+    .stage { position: relative; height: min(72vh, 730px); min-height: 530px; background: #fff; }
+    canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+    canvas.dragging { cursor: grabbing; }
+    aside { padding: 18px 18px 14px; align-self: start; }
+    h2 { margin: 0 0 12px; font-size: 17px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; color: #576170; font-weight: 600; background: #f6f8fa; }
+    th, td { padding: 7px 6px; border-bottom: 1px solid #e9edf1; white-space: nowrap; }
+    td:nth-child(1) { font-weight: 600; }
+    .axis { font-weight: 700; }
+    .x { color: #c62828; } .y { color: #2e7d32; } .z { color: #1565c0; }
+    .math { font-family: inherit; background: #f7f9fb; padding: 11px; border-radius: 7px; font-size: 14px; line-height: 1.6; margin-top: 16px; white-space: nowrap; overflow-x: auto; }
+    .math strong { display: block; font-size: 14px; margin-bottom: 5px; }
+    .legend { display: flex; gap: 15px; align-items: center; font-size: 13px; margin: 13px 0 0; }
+    .swatch { display: inline-block; width: 22px; height: 3px; vertical-align: middle; margin-right: 4px; border-radius: 3px; }
+    @media (max-width: 1200px) { main { grid-template-columns: 1fr; } .stage { height: 60vh; min-height: 440px; } }
+    @media (max-width: 530px) { main { padding: 8px; } header { padding: 16px; } h1 { font-size: 19px; } .stage { min-height: 400px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AR-601M · Task 1 · q = 0 · м</h1>
+  </header>
+  <main>
+    <section class="card">
+      <div class="toolbar">
+        <label for="side">Рука</label>
+        <select id="side"><option value="1">Правая, b = +1</option><option value="-1">Левая, b = −1</option></select>
+        <label for="joint">Ось</label>
+        <select id="joint"><option value="0">q₁ · z</option><option value="1">q₂ · y</option><option value="2">q₃ · x</option><option value="3">q₄ · z</option><option value="4">q₅ · y</option><option value="5">q₆ · x</option></select>
+        <button class="push" id="reset" type="button">Сброс вида</button>
+      </div>
+      <div class="stage"><canvas id="view" aria-label="Интерактивная 3D-схема координатных рамок и смещений"></canvas></div>
+    </section>
+    <aside class="card">
+      <h2>Рамки и оси</h2>
+      <table>
+        <thead><tr><th>Рамка</th><th>Точка</th><th>Ось</th></tr></thead>
+        <tbody>
+          <tr><td>{base}</td><td>B</td><td>—</td></tr>
+          <tr><td>{1}</td><td>B</td><td>q₁: <span class="axis z">z</span></td></tr>
+          <tr><td>{2}</td><td>C</td><td>q₂: <span class="axis y">y</span></td></tr>
+          <tr><td>{3}</td><td>S</td><td>q₃: <span class="axis x">x</span></td></tr>
+          <tr><td>{4}</td><td>W</td><td>q₄: <span class="axis z">z</span></td></tr>
+          <tr><td>{5}</td><td>W</td><td>q₅: <span class="axis y">y</span></td></tr>
+          <tr><td>{6}</td><td>W</td><td>q₆: <span class="axis x">x</span></td></tr>
+          <tr><td>{tool}</td><td>T</td><td>—</td></tr>
+        </tbody>
+      </table>
+      <div class="math">
+        <strong>Цепочка преобразований</strong>
+        <div><sup>base</sup>T<sub>tool</sub>(q,b) = R<sub>z</sub>(q₁)D<sub>z</sub>(l₁)R<sub>z</sub>(b·10°)R<sub>y</sub>(q₂)D<sub>y</sub>(−b·l₂)R<sub>x</sub>(q₃)D<sub>z</sub>(−l₃)R<sub>z</sub>(q₄)R<sub>y</sub>(q₅)R<sub>x</sub>(q₆)D<sub>x</sub>(l₄)</div>
+      </div>
+      <div class="legend"><span><i class="swatch" style="background:#c62828"></i>x</span><span><i class="swatch" style="background:#2e7d32"></i>y</span><span><i class="swatch" style="background:#1565c0"></i>z</span></div>
+    </aside>
+  </main>
+  <script>
+  (function () {
+    'use strict';
+    const canvas = document.getElementById('view');
+    const ctx = canvas.getContext('2d');
+    const side = document.getElementById('side');
+    const joint = document.getElementById('joint');
+    const colors = ['#c62828', '#2e7d32', '#1565c0'];
+    let yaw = -2.2, pitch = 0.52, zoom = 1;
+    let width = 0, height = 0, drag = null;
+
+    function v(x, y, z) { return [x, y, z]; }
+    function add(a, b) { return [a[0]+b[0], a[1]+b[1], a[2]+b[2]]; }
+    function mul(a, t) { return [a[0]*t, a[1]*t, a[2]*t]; }
+    function rot(a, angle) {
+      const c = Math.cos(angle), s = Math.sin(angle);
+      return [c*a[0]-s*a[1], s*a[0]+c*a[1], a[2]];
+    }
+    function geometry() {
+      const b = Number(side.value), alpha = b*Math.PI/18;
+      const B = v(0, 0, 0), C = v(0, 0, .4);
+      const S = add(C, rot(v(0, -b*.18, 0), alpha));
+      const W = add(S, rot(v(0, 0, -.3), alpha));
+      const T = add(W, rot(v(.12, 0, 0), alpha));
+      return {b, alpha, B, C, S, W, T};
+    }
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = rect.width; height = rect.height;
+      canvas.width = Math.round(width*dpr); canvas.height = Math.round(height*dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw();
+    }
+    function project(p) {
+      const g = geometry(), target = v(.035, -.075*g.b, .205);
+      const a = [p[0]-target[0], p[1]-target[1], p[2]-target[2]];
+      const right = [-Math.sin(yaw), Math.cos(yaw), 0];
+      const up = [-Math.sin(pitch)*Math.cos(yaw), -Math.sin(pitch)*Math.sin(yaw), Math.cos(pitch)];
+      const scale = Math.min(width/.67, height/.60)*zoom;
+      return [width*.50 + scale*(a[0]*right[0]+a[1]*right[1]),
+              height*.54 - scale*(a[0]*up[0]+a[1]*up[1]+a[2]*up[2])];
+    }
+    function line(a, b, color, weight, dash) {
+      const p = project(a), q = project(b);
+      ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]);
+      ctx.strokeStyle = color; ctx.lineWidth = weight;
+      ctx.setLineDash(dash || []); ctx.stroke(); ctx.setLineDash([]);
+    }
+    function arrow(a, b, color, weight) {
+      const p = project(a), q = project(b), dx = q[0]-p[0], dy = q[1]-p[1];
+      const length = Math.hypot(dx, dy) || 1, ux = dx/length, uy = dy/length;
+      line(a, b, color, weight);
+      const head = Math.min(10, Math.max(6, length*.28));
+      ctx.beginPath(); ctx.moveTo(q[0], q[1]);
+      ctx.lineTo(q[0]-head*ux+head*.43*uy, q[1]-head*uy-head*.43*ux);
+      ctx.lineTo(q[0]-head*ux-head*.43*uy, q[1]-head*uy+head*.43*ux);
+      ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+    }
+    function dot(p, radius) {
+      const q = project(p); ctx.beginPath(); ctx.arc(q[0], q[1], radius, 0, Math.PI*2);
+      ctx.fillStyle = '#26313e'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
+    }
+    function label(text, p, dx, dy, strong) {
+      const q = project(p), x = q[0]+dx, y = q[1]+dy;
+      ctx.font = (strong ? '600 ' : '') + '13px Arial, Helvetica, sans-serif';
+      const tw = ctx.measureText(text).width, pad = 7, h = 26;
+      const left = dx < 0 ? x-tw-2*pad : x, top = y-h/2;
+      const edgeX = dx < 0 ? left+tw+2*pad : left;
+      ctx.beginPath(); ctx.moveTo(q[0], q[1]); ctx.lineTo(edgeX, y);
+      ctx.strokeStyle = '#b8c1ca'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = '#fff'; ctx.strokeStyle = '#dfe4e9'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect(left, top, tw+2*pad, h, 5); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = strong ? '#17212c' : '#35414d'; ctx.fillText(text, left+pad, y+4.5);
+    }
+    function triad(p, angle, size) {
+      const axes = [rot(v(size,0,0),angle), rot(v(0,size,0),angle), v(0,0,size)];
+      for (let i=0; i<3; i++) arrow(p, add(p,axes[i]), colors[i], 2.2);
+    }
+    function draw() {
+      if (!width || !height) return;
+      const g = geometry();
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, width, height);
+
+      // The four thick black segments are exactly the four fixed translations.
+      [[g.B,g.C],[g.C,g.S],[g.S,g.W],[g.W,g.T]].forEach(pair => line(pair[0],pair[1],'#35414d',3.5));
+      triad(g.B,0,.058); triad(g.C,0,.058); triad(g.S,g.alpha,.058);
+      triad(g.W,g.alpha,.058); triad(g.T,g.alpha,.041);
+
+      // Selected joint: six revolute axes, defined in their own local frames.
+      const axes = [v(0,0,1),rot(v(0,1,0),g.alpha),rot(v(1,0,0),g.alpha),
+                    v(0,0,1),rot(v(0,1,0),g.alpha),rot(v(1,0,0),g.alpha)];
+      const k = Number(joint.value), origin = k === 0 ? g.B : (k === 1 ? g.C : (k === 2 ? g.S : g.W));
+      const axis = axes[k], axisColor = colors[[2,1,0,2,1,0][k]];
+      arrow(origin, add(origin,mul(axis,.105)), '#fff', 8);
+      arrow(origin, add(origin,mul(axis,.105)), axisColor, 4.5);
+
+      [g.B,g.C,g.S,g.W,g.T].forEach(p => dot(p,4.5));
+      label('{base}, {1} · B',g.B,-13,30,true);
+      label('{2} · C',g.C,11,-21,true);
+      label('{3} · S',g.S,-20,-36,true);
+      label('{4}, {5}, {6} · W',g.W,-19,40,true);
+      label('{tool} · T',g.T,20,-27,true);
+      label('l₁ = 0.40 · +z',mul(add(g.B,g.C),.5),-18,0,false);
+      label('l₂ = 0.18 · ' + (g.b===1?'−y′':'+y′'),mul(add(g.C,g.S),.5),18,-28,false);
+      label('l₃ = 0.30 · −z′',mul(add(g.S,g.W),.5),19,0,false);
+      label('l₄ = 0.12 · +x′',mul(add(g.W,g.T),.5),19,31,false);
+      label('Rz(b·10°)',g.C,-20,-48,false);
+      label('q' + '₁₂₃₄₅₆'[k] + ' · ' + 'zyxzyx'[k],add(origin,mul(axis,.105)),15,-16,true);
+
+    }
+    canvas.addEventListener('pointerdown', e => {
+      drag = {x:e.clientX,y:e.clientY,yaw,pitch};
+      canvas.setPointerCapture(e.pointerId); canvas.classList.add('dragging');
+    });
+    canvas.addEventListener('pointermove', e => {
+      if (!drag) return;
+      yaw = drag.yaw + (e.clientX-drag.x)*.008;
+      pitch = Math.max(-1.35,Math.min(1.35,drag.pitch-(e.clientY-drag.y)*.008));
+      draw();
+    });
+    function endDrag() { drag=null; canvas.classList.remove('dragging'); }
+    canvas.addEventListener('pointerup',endDrag); canvas.addEventListener('pointercancel',endDrag);
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault(); zoom = Math.max(.45,Math.min(2.7,zoom*Math.exp(-e.deltaY*.001))); draw();
+    }, {passive:false});
+    side.addEventListener('change',draw); joint.addEventListener('change',draw);
+    document.getElementById('reset').addEventListener('click',() => {yaw=-2.2;pitch=.52;zoom=1;draw();});
+    window.addEventListener('resize',resize); resize();
+  }());
+  </script>
+</body>
+</html>

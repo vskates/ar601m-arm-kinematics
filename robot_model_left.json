@@ -1,0 +1,18 @@
+{
+  "arm_side": "left",
+  "b": -1,
+  "translation_frame": "current_local",
+  "chain": [
+    {"kind": "joint", "name": "q1", "type": "revolute", "axis": "z", "limits_deg": [-90, 90]},
+    {"kind": "offset", "name": "l1", "direction": "+z", "length_m": 0.40},
+    {"kind": "fixed_rotation", "name": "alpha", "axis": "z", "angle_deg": -10},
+    {"kind": "joint", "name": "q2", "type": "revolute", "axis": "y", "limits_deg": [-105, 105]},
+    {"kind": "offset", "name": "l2", "direction": "+y", "length_m": 0.18},
+    {"kind": "joint", "name": "q3", "type": "revolute", "axis": "x", "limits_deg": [-45, 45]},
+    {"kind": "offset", "name": "l3", "direction": "-z", "length_m": 0.30},
+    {"kind": "joint", "name": "q4", "type": "revolute", "axis": "z", "limits_deg": [-90, 90]},
+    {"kind": "joint", "name": "q5", "type": "revolute", "axis": "y", "limits_deg": [-90, 90]},
+    {"kind": "joint", "name": "q6", "type": "revolute", "axis": "x", "limits_deg": [-90, 90]},
+    {"kind": "offset", "name": "l4", "direction": "+x", "length_m": 0.12}
+  ]
+}
