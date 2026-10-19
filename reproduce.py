@@ -72,8 +72,23 @@ def task2_section():
         fig, _ = draw_arm(np.deg2rad(degrees), robot, ROOT / f"figures/task2_{name}.png",
                           f"Right arm: {name}; q={list(degrees)}°")
         plt.close(fig)
-    return (result + "Visualizer: `python src/visualize.py --q Q1 Q2 Q3 Q4 Q5 Q6 --show` "
-              "prints T and displays the arm; without `--show` saves a PNG.\n\n")
+    return result + """### Visualizer (Tasks 2–3)
+
+Run from the repository root. Positions are in metres; CLI angles are in degrees.
+
+```bash
+pixi run python src/visualize.py --q 20 -35 10 25 40 -15 --show
+pixi run python src/visualize.py --fk-target 10 5 -30 -40 -30 20 --show
+pixi run python src/visualize.py --pose 0.278366260 0.072666421 0.149075105 -21.534480182 4.259427843 55.571496700 --show
+```
+
+`--q` takes six joint angles and shows the arm and FK matrix T.
+`--fk-target` takes six joint angles, uses their FK pose as the IK target, and shows every feasible branch.
+`--pose` takes x y z roll pitch yaw, with R = Rz(yaw) Ry(pitch) Rx(roll), and solves IK for that target.
+Add `--side left` for the left arm. Without `--show`, drawings are saved as PNG files.
+Continuous families are printed separately, with one feasible example drawn when available.
+
+"""
 
 
 def task3_section():
