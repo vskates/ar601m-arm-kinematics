@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from task2_fk import FK, load_robot, rotation
-from task3_ik import solve_ik
+from task3_ik import evaluate_family, solve_ik
 from task5_jacobian import chain_frames
 
 
@@ -99,8 +99,33 @@ def main():
             filename = str(Path(args.output).with_stem(Path(args.output).stem + f"_{i}"))
             fig, _ = draw_arm(q, robot, filename, f"{args.side}: IK branch {i}")
             print(f"{i}: {np.rad2deg(q)} deg; residual={np.linalg.norm(FK(q, robot)-target):.2e}; {filename}")
-        for family in result.families:
-            print("Continuous family:", family)
+        for i, family in enumerate(result.families, 1):
+            free = family["free"]
+            if free == "q6":
+                fixed = np.rad2deg([family[f"q{j}_rad"] for j in (1, 2, 3, 5)]).round(6).tolist()
+                intervals = [np.rad2deg(pair).round(6).tolist()
+                             for pair in family["feasible_intervals_rad"]]
+                delta = np.rad2deg(family["delta_rad"])
+                sign = 1 if family["q5_rad"] > 0 else -1
+                print(f"Continuous family {i}: (q1,q2,q3,q5)={fixed} deg; "
+                      f"q4={delta:.6f} {'+' if sign > 0 else '-'} q6 (mod 360 deg); "
+                      f"feasible q6 intervals={intervals} deg")
+                sample_value = sum(family["feasible_intervals_rad"][0]) / 2 if intervals else None
+            else:
+                bounds = np.rad2deg(family["limit_interval_rad"]).round(6).tolist()
+                print(f"Continuous family {i}: {free} joint limits={bounds} deg; "
+                      f"{family['rule']}")
+                if not family["potentially_feasible"]:
+                    print("  no feasible configurations")
+                sample_value = 0.0 if family["potentially_feasible"] else None
+            if sample_value is not None:
+                sample = evaluate_family(family, sample_value, target, robot)
+                for j, q in enumerate(sample.feasible, 1):
+                    filename = str(Path(args.output).with_stem(
+                        Path(args.output).stem + f"_family{i}_{j}"))
+                    fig, _ = draw_arm(q, robot, filename,
+                                      f"{args.side}: family {i}, example {j}")
+                    print(f"  example: {np.rad2deg(q).round(6).tolist()} deg; {filename}")
     if args.show:
         plt.show()
     else:
