@@ -376,7 +376,9 @@ Projected damped least squares with backtracking; pose error uses base-frame pos
 
 ## Task 5 — differential kinematics
 
-Right arm, b=+1, same generic q as Task 2. Base-frame spatial twist [v;ω]=J(q)q̇ (linear m/s, angular rad/s). First derivation: for each joint axis aᵢ through pᵢ, Jᵥᵢ=aᵢ×(p_tool−pᵢ), Jωᵢ=aᵢ. Independent product derivation: differentiate each joint factor in T=F₁…Fₙ, dT/dqᵢ=F₁…Fᵢ₋₁ GᵢFᵢ…Fₙ; extract vᵢ=dp/dqᵢ and ωᵢ=vee((dR/dqᵢ)Rᵀ). FK finite difference: dp/dqᵢ≈[p(q+h eᵢ)−p(q−h eᵢ)]/(2h), ωᵢ≈vee(([R(q+h eᵢ)−R(q−h eᵢ)]/(2h))Rᵀ), h=10⁻⁶ rad. Pairwise Frobenius tolerance 10⁻⁸.
+Full derivations: [PDF](TASK5_JACOBIAN_DERIVATIONS.pdf) · [LaTeX source](TASK5_JACOBIAN_DERIVATIONS.tex).
+
+Right arm, b=+1, same generic q as Task 2. Base-frame tool velocity [v;ω]=J(q)q̇, where v=ṗ (m/s) and ω is angular velocity (rad/s). First derivation: for each joint axis aᵢ through pᵢ, Jᵥᵢ=aᵢ×(p_tool−pᵢ), Jωᵢ=aᵢ. Independent product derivation: differentiate each joint factor in T=F₁…Fₙ, dT/dqᵢ=F₁…Fᵢ₋₁ GᵢFᵢ…Fₙ; extract vᵢ=dp/dqᵢ and ωᵢ=vee((dR/dqᵢ)Rᵀ). FK finite difference: dp/dqᵢ≈[p(q+h dᵢ)−p(q−h dᵢ)]/(2h), ωᵢ≈vee(skew(([R(q+h dᵢ)−R(q−h dᵢ)]/(2h))Rᵀ)), where dᵢ is the ith joint-space basis vector, skew(M)=(M−Mᵀ)/2, and h=10⁻⁶ rad. Pairwise Frobenius tolerance 10⁻⁸.
 
 | case | q (degrees) | geometric vs product | geometric vs FD | product vs FD |
 |---|---|---:|---:|---:|

@@ -1,0 +1,112 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,geometry,microtype}
+\usepackage[hidelinks]{hyperref}
+\geometry{margin=20mm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\hypersetup{pdftitle={AR-601M: Two Jacobian Derivations}}
+
+\begin{document}
+\begin{center}
+  {\Large\bfseries AR-601M: two Jacobian derivations}\\[3pt]
+  Task 5, right and left arms
+\end{center}
+
+\section*{1. Model and velocity convention}
+Let $b=+1$ for the right arm and $b=-1$ for the left arm. Rotations and
+translations act on column vectors about or along the current local axis.
+The base-to-tool chain is
+\begin{align}
+T(q)={}&R_z(q_1)D_z(l_1)R_z(b\alpha)R_y(q_2)D_y(-b l_2)
+\notag\\[-3pt]
+&\quad R_x(q_3)D_z(-l_3)R_z(q_4)R_y(q_5)R_x(q_6)D_x(l_4),
+\end{align}
+where $\alpha=10^\circ$ and $(l_1,l_2,l_3,l_4)=(0.40,0.18,0.30,0.12)$\,m.
+Write $T=\begin{bmatrix}R&p\\0&1\end{bmatrix}$. We seek the \emph{geometric}
+Jacobian of the tool origin: $v=\dot p$ is its linear velocity and
+$[\omega]_\times=\dot R R^\mathsf{T}$ is its angular velocity. Both are
+expressed in the base frame, and
+\begin{equation}
+\begin{bmatrix}v\\\omega\end{bmatrix}=J(q)\dot q,
+\qquad J\in\mathbb R^{6\times6}.
+\label{eq:target}
+\end{equation}
+Here $[x]_\times y=x\times y$, and $\operatorname{vee}([x]_\times)=x$.
+For joint $i$, let $P_i=\begin{bmatrix}U_i&p_i\\0&1\end{bmatrix}$ be the
+prefix of the chain immediately \emph{before} its rotation factor. Its local
+unit axis $e_i$ follows the order $z,y,x,z,y,x$; its base-frame axis is
+$a_i=U_i e_i$. Fixed offsets and the $b\alpha$ rotation are included in
+$P_i$. Let $d_i\in\mathbb R^6$ denote the $i$th joint-space basis vector.
+
+\section*{2. Geometric derivation: velocity about an axis}
+Hold the other joints fixed and increase only $q_i$ by $\varepsilon$. The
+axis line passes through $p_i$ in direction $a_i$, so the tool point and
+orientation change by
+\begin{equation}
+p(q+\varepsilon d_i)=p_i+\exp(\varepsilon[a_i]_\times)(p-p_i),
+\qquad
+R(q+\varepsilon d_i)=\exp(\varepsilon[a_i]_\times)R.
+\end{equation}
+Using $\exp(\varepsilon[a_i]_\times)=I+\varepsilon[a_i]_\times+
+O(\varepsilon^2)$ and differentiating at $\varepsilon=0$ gives
+\begin{equation}
+\frac{\partial p}{\partial q_i}=a_i\times(p-p_i),\qquad
+\frac{\partial R}{\partial q_i}R^\mathsf{T}=[a_i]_\times.
+\end{equation}
+Because instantaneous contributions add, the $i$th column is
+\begin{equation}
+J_i^{\mathrm{geom}}=
+\begin{bmatrix}a_i\times(p-p_i)\\a_i\end{bmatrix},
+\qquad J^{\mathrm{geom}}=[J_1^{\mathrm{geom}}\ \cdots\ J_6^{\mathrm{geom}}].
+\label{eq:geometric}
+\end{equation}
+
+\section*{3. Independent derivation: differentiate the matrix product}
+Number every factor in the complete chain $T=F_1\cdots F_N$; let factor
+$F_{k_i}$ be joint $i$'s pure rotation. With the local generator
+\begin{equation}
+G_i=\begin{bmatrix}[e_i]_\times&0\\0&0\end{bmatrix},
+\qquad F_{k_i}(q_i)=\exp(q_iG_i),
+\qquad \frac{\partial F_{k_i}}{\partial q_i}=G_iF_{k_i},
+\end{equation}
+the product rule, applied to the \emph{full} chain, gives
+\begin{equation}
+\frac{\partial T}{\partial q_i}
+=\underbrace{F_1\cdots F_{k_i-1}}_{P_i}
+G_iF_{k_i}
+\underbrace{F_{k_i+1}\cdots F_N}_{S_i}
+=P_iG_iP_i^{-1}T.
+\label{eq:product}
+\end{equation}
+Multiplication of the homogeneous blocks yields
+\begin{equation}
+P_iG_iP_i^{-1}
+=\begin{bmatrix}[a_i]_\times&-[a_i]_\times p_i\\0&0\end{bmatrix},
+\qquad
+\frac{\partial T}{\partial q_i}
+=\begin{bmatrix}
+[a_i]_\times R & [a_i]_\times(p-p_i)\\0&0
+\end{bmatrix}.
+\end{equation}
+Thus the derivative of the translation gives the top three entries, while
+the derivative of the rotation gives the bottom three:
+\begin{equation}
+J_i^{\mathrm{prod}}=
+\begin{bmatrix}
+\partial p/\partial q_i\\
+\operatorname{vee}((\partial R/\partial q_i)R^\mathsf{T})
+\end{bmatrix}
+=\begin{bmatrix}a_i\times(p-p_i)\\a_i\end{bmatrix}.
+\label{eq:product_result}
+\end{equation}
+The matrix inside $\operatorname{vee}$ is skew-symmetric: differentiating
+$RR^\mathsf{T}=I$ gives
+$(\partial R/\partial q_i)R^\mathsf{T}
++R(\partial R/\partial q_i)^\mathsf{T}=0$.
+Equations~\eqref{eq:geometric} and~\eqref{eq:product_result} therefore
+derive the same base-frame Jacobian by independent routes. Both are
+implemented in \texttt{src/task5\_jacobian.py}; centered FK differences and
+pairwise residuals are reported in \texttt{REPORT.md}, Task~5.
+
+\end{document}
