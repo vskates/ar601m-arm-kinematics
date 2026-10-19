@@ -79,6 +79,8 @@ def task2_section():
 def task3_section():
     derivation = r"""## Task 3 — analytical IK
 
+Standalone derivation: [PDF](TASK3_DERIVATION.pdf) · [LaTeX source](TASK3_DERIVATION.tex).
+
 Both arms use the same limits and lengths; b=+1 (right), b=−1 (left). For target
 \(T=\begin{bmatrix}R&p\\0&1\end{bmatrix}\), the wrist centre is \(W=p-l_4Re_x\). Put
 \(r=W-l_1e_z=(x,y,z)\), \(\rho=\sqrt{x^2+y^2}\),

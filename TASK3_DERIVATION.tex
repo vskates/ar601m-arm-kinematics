@@ -1,0 +1,141 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,geometry,microtype}
+\usepackage[hidelinks]{hyperref}
+\geometry{margin=22mm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\hypersetup{pdftitle={AR-601M: Analytical Inverse Kinematics}}
+
+\begin{document}
+\begin{center}
+  {\Large\bfseries AR-601M: analytical inverse kinematics}\\[3pt]
+  Task 3 derivation for the right and left arms
+\end{center}
+
+\section*{1. Model and target}
+Let $b=+1$ for the right arm and $b=-1$ for the left arm. $R_a$ and $D_a$
+denote homogeneous rotation and translation about or along the \emph{current
+local} axis $a$. The forward chain is
+\begin{align}
+T_{0t}={}&R_z(q_1)D_z(l_1)R_z(b\alpha)R_y(q_2)D_y(-b l_2)
+\notag\\[-3pt]
+&\quad R_x(q_3)D_z(-l_3)R_z(q_4)R_y(q_5)R_x(q_6)D_x(l_4),
+\label{eq:chain}
+\end{align}
+where $\alpha=10^\circ$ and $(l_1,l_2,l_3,l_4)=(0.40,0.18,0.30,0.12)$\,m.
+Angles are evaluated in radians. The joint axes are $z,y,x,z,y,x$ in that
+order. Let the requested pose be
+$T=\begin{bmatrix}R&p\\0&1\end{bmatrix}\in SE(3)$, with $e_x,e_y,e_z$ the
+standard unit vectors. Remove the final tool offset first:
+\begin{equation}
+W=p-l_4Re_x,\qquad C=l_1e_z,\qquad r=W-C=(x,y,z)^\mathsf{T},
+\qquad \theta=q_1+b\alpha .
+\label{eq:wrist}
+\end{equation}
+$W$ is the common wrist-joint centre; $C$ is the end of the first offset.
+Because $R_y(q_2)e_y=e_y$, the end of the shoulder offset is
+\begin{equation}
+S=C-b l_2R_z(\theta)e_y.
+\label{eq:shoulder}
+\end{equation}
+
+\section*{2. Solve the shoulder rotation $q_1$}
+The segment from $S$ to $W$ has length $l_3$. Expanding its squared length,
+using $R_z(\theta)e_y=(-\sin\theta,\cos\theta,0)^\mathsf{T}$, gives
+\begin{align}
+l_3^2&=\|W-S\|^2
+=\|r+b l_2R_z(\theta)e_y\|^2 \notag\\
+&=\|r\|^2+l_2^2-2b l_2(x\sin\theta-y\cos\theta).
+\end{align}
+Set $K=(\|r\|^2+l_2^2-l_3^2)/(2l_2)$,
+$\rho=\sqrt{x^2+y^2}$, and $\phi=\operatorname{atan2}(y,x)$. Since
+$b^{-1}=b$,
+\begin{equation}
+x\sin\theta-y\cos\theta
+=\rho\sin(\theta-\phi)=bK.
+\label{eq:shoulderconstraint}
+\end{equation}
+For $\rho>0$ and $|K|\leq\rho$, the two candidates are
+\begin{equation}
+\theta=\phi+\arcsin(bK/\rho)
+\quad\text{or}\quad
+\theta=\phi+\pi-\arcsin(bK/\rho),
+\qquad q_1=\theta-b\alpha\pmod{2\pi}.
+\label{eq:q1}
+\end{equation}
+They coincide modulo $2\pi$ when $|K|=\rho$. If $|K|>\rho$, the target is
+unreachable. If $\rho=0$, equation~\eqref{eq:shoulderconstraint} requires
+$K=0$; then $q_1$ is free and the remaining joints must be solved for each
+chosen value. These rules apply to both arms: changing $b$ changes the signs
+of the $10^\circ$ rotation and the shoulder offset.
+
+\section*{3. Solve the arm joints $q_2,q_3$}
+For each $q_1$ candidate, express the wrist displacement in the axes after
+the fixed rotation. Equations~\eqref{eq:chain}--\eqref{eq:shoulder} give
+\begin{equation}
+u=R_z(-\theta)r+b l_2e_y
+=R_y(q_2)R_x(q_3)(-l_3e_z)
+=l_3\begin{bmatrix}
+-\sin q_2\cos q_3\\ \sin q_3\\ -\cos q_2\cos q_3
+\end{bmatrix}.
+\label{eq:u}
+\end{equation}
+For each $\sigma\in\{+1,-1\}$, representing the sign of $\cos q_3$,
+\begin{equation}
+c=\sqrt{l_3^2-u_y^2},\qquad
+q_3=\operatorname{atan2}(u_y,\sigma c),\qquad
+q_2=\operatorname{atan2}(-\sigma u_x,-\sigma u_z).
+\label{eq:q23}
+\end{equation}
+When $c=0$, $q_3=\pm90^\circ$ and $q_2$ is free. This is a continuous
+family before limits, but it violates the specified $q_3\in[-45^\circ,45^\circ]$
+limit.
+
+\section*{4. Solve the spherical wrist $q_4,q_5,q_6$}
+The arm orientation before the wrist is
+$A=R_z(\theta)R_y(q_2)R_x(q_3)$. Hence
+\begin{equation}
+Q=A^\mathsf{T}R=R_z(q_4)R_y(q_5)R_x(q_6).
+\label{eq:Q}
+\end{equation}
+Its entries satisfy
+$Q_{11}=\cos q_4\cos q_5$, $Q_{21}=\sin q_4\cos q_5$,
+$Q_{31}=-\sin q_5$, $Q_{32}=\cos q_5\sin q_6$, and
+$Q_{33}=\cos q_5\cos q_6$. Put
+$h=\sqrt{Q_{11}^2+Q_{21}^2}=|\cos q_5|$. For $h>0$, each
+$\tau\in\{+1,-1\}$ gives one Euler branch:
+\begin{equation}
+\begin{aligned}
+q_5&=\operatorname{atan2}(-Q_{31},\tau h),\\
+q_4&=\operatorname{atan2}(\tau Q_{21},\tau Q_{11}),\\
+q_6&=\operatorname{atan2}(\tau Q_{32},\tau Q_{33}).
+\end{aligned}
+\label{eq:q456}
+\end{equation}
+If $h=0$, let $s=-Q_{31}\in\{+1,-1\}$ and
+$\delta=\operatorname{atan2}(sQ_{23},Q_{22})$. Then
+\begin{equation}
+q_5=s\pi/2,\qquad q_4-sq_6=\delta\pmod{2\pi}.
+\label{eq:wristfamily}
+\end{equation}
+This is a continuous wrist family, not an isolated branch. Its feasible
+$q_6$ values satisfy $q_6\in[L_6,U_6]$ and, for some integer $k$,
+$L_4\leq\delta+s q_6+2\pi k\leq U_4$.
+
+\section*{5. Branch selection and checks}
+For a nonsingular target, equations~\eqref{eq:q1}, \eqref{eq:q23}, and
+\eqref{eq:q456} produce at most $2\cdot2\cdot2=8$ real branches, for either
+value of $b$. Angles are wrapped to $[-\pi,\pi)$. Two branches are duplicates
+when $\max_i|\operatorname{wrap}(q_i-\tilde q_i)|<10^{-8}$\,rad; duplicates
+are removed \emph{before} applying the closed joint limits. Limit comparisons
+allow $10^{-9}$\,rad for rounding at a bound. Each isolated branch must
+reproduce $T$ with $\|FK(q)-T\|_F\leq10^{-8}$. The implementation also checks
+that the input is a valid pose in $SE(3)$ and uses $10^{-10}$\,m for positional
+degeneracy tests.
+
+The implementation is \texttt{src/task3\_ik.py}; numerical branch lists,
+feasibility, and position/orientation residuals for both arms are in
+\texttt{REPORT.md}, Task 3.
+
+\end{document}

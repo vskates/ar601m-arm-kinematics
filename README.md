@@ -14,7 +14,7 @@ Photo from the [course assignment](https://github.com/Lupasic/In2Ro_MIPT_2026/bl
 - Numerical IK reaches both branches from different initial configurations; unsuccessful runs and their residuals are retained in the report.
 - Two Jacobian derivations agree with a finite-difference check. A 15,625-configuration joint-space scan and a fixed-orientation Cartesian slice show singular regions and feasible IK counts.
 
-The [technical report](REPORT.md) gives the derivations, parameters, numerical results, tolerances, and figures for Tasks 1–6.
+The [technical report](REPORT.md) gives the derivations, parameters, numerical results, tolerances, and figures for Tasks 1–6. The Task 3 IK derivation is also available as a [rendered PDF](TASK3_DERIVATION.pdf) with its [LaTeX source](TASK3_DERIVATION.tex).
 
 ## Reproduce
 
